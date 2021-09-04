@@ -31,11 +31,14 @@ def get_rasp():
 app = Flask(__name__)
 token = os.getenv('API_KEY')
 bot = telebot.TeleBot(token)
+bot.set_my_commands([
+    telebot.types.BotCommand("/rasp", "Узнать расписание на неделю")
+])
 
 
-@bot.message_handler(commands=['start', 'help'])
+@bot.message_handler(commands=['rasp'])
 def send_welcome(message: telebot.types.Message):
-    bot.send_message(message.chat.id, get_rasp())
+    bot.send_message(message.chat.id, get_rasp(), )
 
 
 @app.route("/" + token, methods=['POST'])
