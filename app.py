@@ -11,8 +11,7 @@ def reverse_date(date: str):
     return '.'.join(date.split('.')[::-1])
 
 
-def get_rasp():
-    date = str(datetime.date.today())
+def get_rasp(date):
     url = 'https://ruz.spbstu.ru/api/v1/ruz/scheduler/33858?date=' + date
 
     resp = requests.get(url).json()
@@ -32,13 +31,19 @@ app = Flask(__name__)
 token = os.getenv('API_KEY')
 bot = telebot.TeleBot(token)
 bot.set_my_commands([
-    telebot.types.BotCommand("/rasp", "Узнать расписание на неделю")
+    telebot.types.BotCommand("/rasp", "Расписание на неделю"),
+    telebot.types.BotCommand("/nextrasp", "Расписание на следующую неделю")
 ])
 
 
 @bot.message_handler(commands=['rasp'])
-def send_welcome(message: telebot.types.Message):
-    bot.send_message(message.chat.id, get_rasp(), )
+def send_rasp(message: telebot.types.Message):
+    bot.send_message(message.chat.id, get_rasp(str(datetime.date.today())))
+
+
+@bot.message_handler(commands=['nextrasp'])
+def send_rasp(message: telebot.types.Message):
+    bot.send_message(message.chat.id, get_rasp(str(datetime.date.today() + datetime.timedelta(days=7))))
 
 
 @app.route("/" + token, methods=['POST'])
