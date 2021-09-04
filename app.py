@@ -49,7 +49,7 @@ def get_message():
 @app.route("/")
 def webhook():
     bot.remove_webhook()
-    bot.set_webhook('https://rasp_10022.herokuapp.com/' + token)
+    bot.set_webhook('https://rasp-10022.herokuapp.com/' + token)
     return "!", 200
 
 
