@@ -7,6 +7,17 @@ import datetime
 from flask import Flask, request
 
 
+day_name = {
+    0: 'пн',
+    1: 'вт',
+    2: 'ср',
+    3: 'чт',
+    4: 'пт',
+    5: 'сб',
+    6: 'вс'
+}
+
+
 def reverse_date(date: str):
     return '.'.join(date.split('.')[::-1])
 
@@ -20,9 +31,10 @@ def get_rasp(date):
     date_end = reverse_date(resp['week']['date_end'])
 
     text = f'Расписание с {date_start} по {date_end}\n'
-    for week in resp['days']:
-        text += week['date'][-2:] + ':\n'
-        for lesson in week['lessons']:
+    for day in resp['days']:
+        weekday_name = day_name[int(day['weekday'])]
+        text += f"{day['date'][-2:]} ({weekday_name}):\n"
+        for lesson in day['lessons']:
             text += f"\t{lesson['time_start']}-{lesson['time_end']} {lesson['subject_short']}\n"
     return text
 
