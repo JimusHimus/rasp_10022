@@ -29,7 +29,7 @@ def get_rasp():
 
 
 server = Flask(__name__)
-token = '1760462020:AAGBJYFtvN3moRBoDR7Vh9mrhuRHxvCgP_c'
+token = os.getenv('API_KEY')
 bot = telebot.TeleBot(token)
 
 
