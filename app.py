@@ -35,7 +35,7 @@ def get_rasp(date):
         weekday_name = day_name[int(day['weekday'])]
         text += f"{day['date'][-2:]} ({weekday_name}):\n"
         for lesson in day['lessons']:
-            text += f"\t{lesson['time_start']}-{lesson['time_end']} {lesson['subject_short']}\n"
+            text += f"\t{lesson['time_start']}-{lesson['time_end']} ({lesson['typeObj']['abbr']}) {lesson['subject_short']}\n"
     return text
 
 
