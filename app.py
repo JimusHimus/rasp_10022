@@ -30,12 +30,12 @@ def get_rasp(date):
     date_start = reverse_date(resp['week']['date_start'])
     date_end = reverse_date(resp['week']['date_end'])
 
-    text = f'Расписание с {date_start} по {date_end}\n'
+    text = f'<a href="https://ruz.spbstu.ru/faculty/95/groups/33858?date={date}">Расписание</a> с <b>{date_start}</b> по <b>{date_end}</b>\n'
     for day in resp['days']:
         weekday_name = day_name[int(day['weekday'])]
-        text += f"{day['date'][-2:]} ({weekday_name}):\n"
+        text += f"<u><b>{day['date'][-2:]}</b></u> (<b>{weekday_name}</b>):\n"
         for lesson in day['lessons']:
-            text += f"\t{lesson['time_start']}-{lesson['time_end']} ({lesson['typeObj']['abbr']}) {lesson['subject_short']}\n"
+            text += f"\t<i>{lesson['time_start']}-{lesson['time_end']}</i> ({lesson['typeObj']['abbr']}) <u>{lesson['subject_short']}</u>\n"
     return text
 
 
@@ -50,12 +50,12 @@ bot.set_my_commands([
 
 @bot.message_handler(commands=['rasp'])
 def send_rasp(message: telebot.types.Message):
-    bot.send_message(message.chat.id, get_rasp(str(datetime.date.today())))
+    bot.send_message(message.chat.id, get_rasp(str(datetime.date.today())), parse_mode="HTML")
 
 
 @bot.message_handler(commands=['nextrasp'])
 def send_rasp(message: telebot.types.Message):
-    bot.send_message(message.chat.id, get_rasp(str(datetime.date.today() + datetime.timedelta(days=7))))
+    bot.send_message(message.chat.id, get_rasp(str(datetime.date.today() + datetime.timedelta(days=7))), parse_mode="HTML")
 
 
 @app.route("/" + token, methods=['POST'])
