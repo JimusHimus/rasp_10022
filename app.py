@@ -17,6 +17,8 @@ day_name = {
     7: 'вс'
 }
 
+REDIS_ID_KEY = 'last_message_id'
+
 
 def reverse_date(date: str):
     return '.'.join(date.split('.')[::-1])
@@ -40,6 +42,24 @@ def get_rasp(date):
     return text
 
 
+def save_last_id(message_id):
+    rc.set(REDIS_ID_KEY, message_id)
+
+
+def get_last_id():
+    return rc.get(REDIS_ID_KEY)
+
+
+def handle_message(user_message: telebot.types.Message, to_send):
+    chat_id = user_message.chat.id
+    last_id = get_last_id()
+    bot.delete(chat_id, last_id)
+
+    sent = bot.send_message(chat_id, to_send, parse_mode="HTML")
+    save_last_id(sent.id)
+    user_message.delete()
+
+
 app = Flask(__name__)
 token = os.getenv('API_KEY')
 bot = telebot.TeleBot(token)
@@ -48,15 +68,20 @@ bot.set_my_commands([
     telebot.types.BotCommand("/nextrasp", "Расписание на следующую неделю")
 ])
 
+r_host = os.getenv('REDIS_HOST')
+r_port = os.getenv('REDIS_PORT')
+r_pass = os.getenv('REDIS_PASS')
+rc = redis.Redis(host=r_host, port=r_port, password=r_pass)
+
 
 @bot.message_handler(commands=['rasp'])
 def send_rasp(message: telebot.types.Message):
-    bot.send_message(message.chat.id, get_rasp(str(datetime.date.today())), parse_mode="HTML")
+    handle_message(message, get_rasp(str(datetime.date.today())))
 
 
 @bot.message_handler(commands=['nextrasp'])
 def send_rasp(message: telebot.types.Message):
-    bot.send_message(message.chat.id, get_rasp(str(datetime.date.today() + datetime.timedelta(days=7))), parse_mode="HTML")
+    handle_message(message, get_rasp(str(datetime.date.today() + datetime.timedelta(days=7))))
 
 
 @app.route("/" + token, methods=['POST'])
