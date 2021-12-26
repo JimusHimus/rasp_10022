@@ -18,7 +18,7 @@ day_name = {
     7: 'вс'
 }
 
-REDIS_ID_KEY = 'last_message_id'
+REDIS_ID_KEY = 'last_message_id_'
 
 
 def reverse_date(date: str):
@@ -43,22 +43,26 @@ def get_rasp(date):
     return text
 
 
-def save_last_id(message_id):
-    rc.set(REDIS_ID_KEY, message_id)
+def save_last_id(chat_id: int, message_id: int):
+    rc.set(REDIS_ID_KEY + str(chat_id), message_id)
 
 
-def get_last_id():
-    return rc.get(REDIS_ID_KEY)
+def get_last_id(chat_id: int):
+    value = rc.get(REDIS_ID_KEY + str(chat_id))
+    if not value:
+        rc.set(REDIS_ID_KEY + str(chat_id), -1)
+        return -1
+    return int(value)
 
 
 def handle_message(user_message: telebot.types.Message, to_send):
     chat_id = user_message.chat.id
-    last_id = get_last_id()
-    bot.delete(chat_id, last_id)
-
+    last_id = get_last_id(chat_id)
+    if last_id != -1:
+        bot.delete_message(chat_id, last_id)
     sent = bot.send_message(chat_id, to_send, parse_mode="HTML")
-    save_last_id(sent.id)
-    user_message.delete()
+    save_last_id(chat_id, sent.message_id)
+    bot.delete_message(chat_id, user_message.message_id)
 
 
 app = Flask(__name__)
