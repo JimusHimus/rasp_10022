@@ -56,13 +56,20 @@ def get_last_id(chat_id: int):
 
 
 def handle_message(user_message: telebot.types.Message, to_send):
+    print(f'Message from {user_message.from_user.full_name} ({user_message.from_user.username})')
     chat_id = user_message.chat.id
     last_id = get_last_id(chat_id)
     if last_id != -1:
-        bot.delete_message(chat_id, last_id)
+        try:
+            bot.delete_message(chat_id, last_id)
+        except Exception:
+            print('Can\'t delete old message')
     sent = bot.send_message(chat_id, to_send, parse_mode="HTML")
     save_last_id(chat_id, sent.message_id)
-    bot.delete_message(chat_id, user_message.message_id)
+    try:
+        bot.delete_message(chat_id, user_message.message_id)
+    except Exception:
+        print('Can\'t delete message (no adm priv)')
 
 
 app = Flask(__name__)
