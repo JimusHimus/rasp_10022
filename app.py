@@ -5,8 +5,8 @@ import requests
 import datetime
 import redis
 
+from functools import lru_cache
 from flask import Flask, request
-
 
 day_name = {
     1: 'пн',
@@ -25,6 +25,7 @@ def reverse_date(date: str):
     return '.'.join(date.split('.')[::-1])
 
 
+@lru_cache()
 def get_rasp(date):
     url = 'https://ruz.spbstu.ru/api/v1/ruz/scheduler/33858?date=' + date
 
