@@ -26,15 +26,15 @@ def reverse_date(date: str):
 
 
 @lru_cache()
-def get_rasp(date):
-    url = 'https://ruz.spbstu.ru/api/v1/ruz/scheduler/33858?date=' + date
+def get_rasp(group_id: int, date: str):
+    url = f'https://ruz.spbstu.ru/api/v1/ruz/scheduler/{group_id}?date={date}'
 
     resp = requests.get(url).json()
 
     date_start = reverse_date(resp['week']['date_start'])
     date_end = reverse_date(resp['week']['date_end'])
 
-    text = f'<a href="https://ruz.spbstu.ru/faculty/95/groups/33858?date={date}">Расписание</a> с <b>{date_start}</b> по <b>{date_end}</b>\n'
+    text = f'<a href="https://ruz.spbstu.ru/faculty/95/groups/{group_id}?date={date}">Расписание</a> с <b>{date_start}</b> по <b>{date_end}</b>\n'
     for day in resp['days']:
         weekday_name = day_name[int(day['weekday'])]
         text += f"<b>{day['date'][-2:]}</b> (<b>{weekday_name}</b>):\n"
@@ -56,9 +56,21 @@ def get_last_id(chat_id: int):
     return int(value)
 
 
-def handle_message(user_message: telebot.types.Message, to_send):
-    print(f'Message from {user_message.from_user.full_name} ({user_message.from_user.username})')
+def handle_message(user_message: telebot.types.Message, command: str):
     chat_id = user_message.chat.id
+    print(f'Message from {user_message.from_user.full_name} ({user_message.from_user.username}, id {chat_id})')
+    to_send = 'err'
+
+    if chat_id == 187479117:
+        rasp_id = 34989
+    else:
+        rasp_id = 33858
+
+    if command == 'rasp':
+        to_send = get_rasp(rasp_id, str(datetime.date.today()))
+    if command == 'nextrasp':
+        to_send = get_rasp(rasp_id, str(datetime.date.today() + datetime.timedelta(days=7)))
+
     last_id = get_last_id(chat_id)
     if last_id != -1:
         try:
@@ -89,12 +101,12 @@ rc = redis.Redis(host=r_host, port=r_port, password=r_pass)
 
 @bot.message_handler(commands=['rasp'])
 def send_rasp(message: telebot.types.Message):
-    handle_message(message, get_rasp(str(datetime.date.today())))
+    handle_message(message, 'rasp')
 
 
 @bot.message_handler(commands=['nextrasp'])
 def send_rasp(message: telebot.types.Message):
-    handle_message(message, get_rasp(str(datetime.date.today() + datetime.timedelta(days=7))))
+    handle_message(message, 'nextrasp')
 
 
 @app.route("/" + token, methods=['POST'])
