@@ -30,6 +30,8 @@ def get_rasp(group_id: int, date: str):
     url = f'https://ruz.spbstu.ru/api/v1/ruz/scheduler/{group_id}?date={date}'
 
     resp = requests.get(url).json()
+    if resp.get('error'):
+        return resp.get('text')
 
     date_start = reverse_date(resp['week']['date_start'])
     date_end = reverse_date(resp['week']['date_end'])
