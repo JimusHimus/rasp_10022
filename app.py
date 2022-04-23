@@ -33,10 +33,14 @@ def get_rasp(group_id: int, date: str):
     if resp.get('error'):
         return resp.get('text')
 
+    is_odd = resp['week']['is_odd']
     date_start = reverse_date(resp['week']['date_start'])
     date_end = reverse_date(resp['week']['date_end'])
 
-    text = f'<a href="https://ruz.spbstu.ru/faculty/95/groups/{group_id}?date={date}">Расписание</a> с <b>{date_start}</b> по <b>{date_end}</b>\n'
+    what_week = 'нечётная' if is_odd else 'чётная'
+    header = f'Расписание</a> с <b>{date_start}</b> по <b>{date_end}</b> (<b>{what_week}</b> неделя)'
+
+    text = f'<a href="https://ruz.spbstu.ru/faculty/95/groups/{group_id}?date={date}">{header}\n'
     for day in resp['days']:
         weekday_name = day_name[int(day['weekday'])]
         text += f"<b>{day['date'][-2:]}</b> (<b>{weekday_name}</b>):\n"
