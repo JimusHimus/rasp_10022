@@ -70,7 +70,7 @@ def handle_message(user_message: telebot.types.Message, command: str):
     if chat_id == 187479117:
         rasp_id = 34989
     else:
-        rasp_id = 33858
+        rasp_id = 35499
 
     if command == 'rasp':
         to_send = get_rasp(rasp_id, str(datetime.date.today()))
