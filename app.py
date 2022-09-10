@@ -45,7 +45,9 @@ def get_rasp(group_id: int, date: str):
         weekday_name = day_name[int(day['weekday'])]
         text += f"<b>{day['date'][-2:]}</b> (<b>{weekday_name}</b>):\n"
         for lesson in day['lessons']:
-            text += f"\t<i>{lesson['time_start']}-{lesson['time_end']}</i> ({lesson['typeObj']['abbr']})\t{lesson['subject_short']}\n"
+            additional_info = lesson['additional_info']
+            subgroup = f", {additional_info[additional_info.rfind('п/г'):]}" if 'п/г' in additional_info else ''
+            text += f"\t<i>{lesson['time_start']}-{lesson['time_end']}</i> ({lesson['typeObj']['abbr']}{subgroup})\t{lesson['subject_short']}\n"
         text += '\n'
     return text
 
