@@ -79,6 +79,8 @@ def handle_message(user_message: telebot.types.Message, command: str):
     if command == 'nextrasp':
         to_send = get_rasp(rasp_id, str(datetime.date.today() + datetime.timedelta(days=7)))
 
+    print(f'Message len: {len(to_send)}')
+
     last_id = get_last_id(chat_id)
     if last_id != -1:
         try:
