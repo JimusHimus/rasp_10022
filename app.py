@@ -29,7 +29,12 @@ def reverse_date(date: str):
 def get_rasp(group_id: int, date: str):
     url = f'https://ruz.spbstu.ru/api/v1/ruz/scheduler/{group_id}?date={date}'
 
-    resp = requests.get(url).json()
+    try:
+        resp = requests.get(url, timeout=3).json()
+    except Exception as e:
+        print(e)
+        return 'Ошибка при выполнении запроса получения расписания'
+
     if resp.get('error'):
         return resp.get('text')
 
