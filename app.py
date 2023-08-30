@@ -77,7 +77,7 @@ def handle_message(user_message: telebot.types.Message, command: str):
     if chat_id == 187479117:
         rasp_id = 34989
     else:
-        rasp_id = 35499
+        rasp_id = 38805
 
     if command == 'rasp':
         to_send = get_rasp(rasp_id, str(datetime.date.today()))
@@ -106,10 +106,8 @@ bot.set_my_commands([
     telebot.types.BotCommand("/nextrasp", "Расписание на следующую неделю")
 ])
 
-r_host = os.getenv('REDIS_HOST')
-r_port = os.getenv('REDIS_PORT')
-r_pass = os.getenv('REDIS_PASS')
-rc = redis.Redis(host=r_host, port=r_port, password=r_pass)
+redis_url = urlparse(os.environ.get('REDISCLOUD_URL'))
+rc = redis.Redis(host=redis_url.hostname, port=redis_url.port, password=redis_url.password)
 
 
 @bot.message_handler(commands=['rasp'])
