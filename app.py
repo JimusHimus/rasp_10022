@@ -1,11 +1,11 @@
-import os
-
-import telebot
-import requests
 import datetime
-import redis
-
+import os
 from functools import lru_cache
+from urllib.parse import urlparse
+
+import redis
+import requests
+import telebot
 from flask import Flask, request
 
 day_name = {
